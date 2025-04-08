@@ -1,0 +1,104 @@
+
+
+LOW_CROUCH_KEY = DIK_keys.DIK_Z
+BOOL_NEW_WALK_BEHAVIOR = false
+
+local mcm_keybinds = ui_mcm and ui_mcm.key_hold
+
+
+
+
+function on_mcm_load()
+    return {
+        id = "low_crouch_key", sh = true, gr = {
+            {id = "title", type = "slide", link = "ui_options_slider_player", text = "ui_mcm_text", size = {512, 50}, spacing = 20},
+			
+            {id = "key", type = "key_bind", val = 2, def = LOW_CROUCH_KEY},			
+			{id = "new_walk_behaviour", type = "check", val = 1, def = false},
+
+        }
+    }
+end
+
+function on_option_change(mcm)
+    if mcm then
+        LOW_CROUCH_KEY = ui_mcm.get("low_crouch_key/key")
+		BOOL_NEW_WALK_BEHAVIOR = ui_mcm.get("low_crouch_key/new_walk_behaviour")
+		if not BOOL_NEW_WALK_BEHAVIOR then slow_walk = false end
+    end
+end
+
+
+
+
+slow_walk = false
+prevent_recursion = false
+
+function on_before_key_press(key, bind, dis, flags)
+    if prevent_recursion then
+        return
+    end
+
+    prevent_recursion = true
+
+    -- LOW CROUCH (Handled first)
+    if key == LOW_CROUCH_KEY then
+        if (IsMoveState('mcAccel') and IsMoveState('mcCrouch')) or (not IsMoveState('mcAccel') and not IsMoveState('mcCrouch')) then
+            if slow_walk and IsMoveState('mcAccel') and IsMoveState('mcCrouch') then
+                level.press_action(bind_to_dik(key_bindings.kACCEL))
+            end
+            level.press_action(bind_to_dik(key_bindings.kCROUCH))
+            level.press_action(bind_to_dik(key_bindings.kACCEL))
+        elseif IsMoveState('mcCrouch') then
+            level.press_action(bind_to_dik(key_bindings.kACCEL))
+        else
+            level.press_action(bind_to_dik(key_bindings.kCROUCH))
+        end
+
+	
+	-- CROUCH
+    elseif bind == key_bindings.kCROUCH then
+        if IsMoveState('mcAccel') then
+            if IsMoveState('mcCrouch') then
+                level.press_action(bind_to_dik(key_bindings.kACCEL))
+                flags.ret_value = false
+            else
+                level.press_action(bind_to_dik(key_bindings.kACCEL))
+            end
+        elseif slow_walk and IsMoveState('mcCrouch') then
+            level.press_action(bind_to_dik(key_bindings.kACCEL))
+        end
+	
+	-- WALK
+    elseif bind == key_bindings.kACCEL then
+        if BOOL_NEW_WALK_BEHAVIOR then
+            slow_walk = true
+        end
+        if IsMoveState('mcCrouch') then
+            if IsMoveState('mcAccel') then
+                level.press_action(bind_to_dik(key_bindings.kCROUCH))
+                flags.ret_value = false
+            else
+                level.press_action(bind_to_dik(key_bindings.kCROUCH))
+            end
+        elseif slow_walk and IsMoveState('mcAccel') then
+            level.press_action(bind_to_dik(key_bindings.kACCEL))
+        end
+		
+	-- SPRINT
+    elseif bind == key_bindings.kSPRINT_TOGGLE then
+        if BOOL_NEW_WALK_BEHAVIOR then
+            slow_walk = false
+        end
+    end
+
+    prevent_recursion = false
+end
+
+
+
+function on_game_start()
+    RegisterScriptCallback("on_before_key_press", on_before_key_press)
+	RegisterScriptCallback("on_option_change",on_option_change)	
+	on_option_change(mcm_keybinds)
+end

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="windows-1251"?>
+
+<string_table>
+	
+	<string id="ui_mcm_menu_low_crouch_key">
+		<text>Low Crouch Key</text>
+	</string>
+	<string id="ui_mcm_text">
+		<text>Low Crouch Key by Blackburn</text>
+	</string>
+	<string id="ui_mcm_low_crouch_key_new_walk_behaviour">
+		<text>Enable new walk key behaviour</text>
+	</string>
+	<string id="ui_mcm_low_crouch_key_new_walk_behaviour_desc">
+		<text>If this is off: walk key toggles the walk state. That means that if you are not walking - you start walking by pressing walk key. And if you are already walking - by pressing walk key - walk is canceled and you start moving with normal speed.\n\nIf this is on: walk key dont toggles walk state. Pressing walk key will always make you walk. To start move with normal speed you need to tap sprint key. Another feature: the game will remember your previous 'speed' when you stand up (If u walk, then press crouch key twice to crouch and to stand up: you will be in walk state again)
+		</text>
+	</string>
+	
+	
+	<string id="ui_mcm_low_crouch_key_key">
+		<text>Low Crouch Hotkey</text>
+	</string>
+	
+</string_table>
